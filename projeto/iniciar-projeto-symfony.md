@@ -56,26 +56,78 @@ composer require symfony/http-client
 composer require doctrine/doctrine-migrations-bundle
 ```
 
-## 3. Instalar autenticação JWT
+## 3. Definir autenticação por token próprio
 
-Para autenticação da API, use JWT:
+Neste projeto, a autenticação não usará JWT padrão. A API deve usar um token próprio, opaco, enviado por header HTTP e validado no backend com apoio de um salt/pepper de aplicação.
 
-```bash
-composer require lexik/jwt-authentication-bundle
-```
-
-Gerar as chaves JWT:
+Pacote necessário:
 
 ```bash
-php bin/console lexik:jwt:generate-keypair
+composer require symfony/security-bundle
 ```
 
-Depois, confira se o `.env` recebeu as variaveis:
+Variáveis sugeridas no `.env`:
 
 ```env
-JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
-JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
-JWT_PASSPHRASE=
+APP_AUTH_HEADER=X-Portfolio-Token
+APP_AUTH_TOKEN_SALT=troque_este_valor_por_um_salt_forte
+APP_AUTH_TOKEN_TTL_SECONDS=2592000
+```
+
+Fluxo recomendado:
+
+```md
+1. Usuario faz login com email e senha.
+2. Backend valida a senha com hash seguro.
+3. Backend gera um token aleatorio forte.
+4. Backend retorna o token puro apenas uma vez para o cliente.
+5. Backend salva no banco apenas o hash do token usando o salt/pepper.
+6. Cliente envia o token nas proximas requisicoes pelo header X-Portfolio-Token.
+7. Backend aplica o mesmo hash no token recebido e procura uma sessao ativa.
+```
+
+Formato de header:
+
+```http
+X-Portfolio-Token: token_gerado_no_login
+```
+
+Tabela sugerida para sessões/tokens:
+
+```md
+auth_tokens
+- id
+- user_id
+- token_hash
+- name
+- ip_address
+- user_agent
+- expires_at
+- revoked_at
+- created_at
+- updated_at
+```
+
+Classes sugeridas:
+
+```md
+src/Entity/AuthToken.php
+src/Repository/AuthTokenRepository.php
+src/Service/AuthTokenService.php
+src/Security/HeaderTokenAuthenticator.php
+src/Security/CurrentUserProvider.php
+```
+
+Regras importantes:
+
+```md
+- Nunca salvar o token puro no banco.
+- Usar random_bytes para gerar o token.
+- Usar hash_hmac com APP_AUTH_TOKEN_SALT para gerar token_hash.
+- Permitir revogar token no logout.
+- Definir expiração do token.
+- Validar se o usuario ainda esta ativo.
+- Aplicar rate limit no login.
 ```
 
 ## 4. Configurar banco MySQL
@@ -222,9 +274,32 @@ Servicos sugeridos:
 
 ```md
 src/Service/AuthService.php
+src/Service/AuthTokenService.php
 src/DTO/RegisterUserDTO.php
 src/DTO/LoginDTO.php
 src/Mapper/UserMapper.php
+src/Security/HeaderTokenAuthenticator.php
+```
+
+O endpoint de login deve retornar o token próprio:
+
+```json
+{
+  "success": true,
+  "message": "Login realizado com sucesso.",
+  "data": {
+    "token": "token_gerado_no_login",
+    "token_type": "custom_header",
+    "header": "X-Portfolio-Token",
+    "expires_at": "2026-06-01T00:00:00-03:00"
+  }
+}
+```
+
+As rotas protegidas devem exigir o header:
+
+```http
+X-Portfolio-Token: token_gerado_no_login
 ```
 
 ## 10. Padronizar respostas JSON
@@ -477,7 +552,7 @@ Fase 1:
 2. Instalar pacotes essenciais
 3. Configurar banco MySQL
 4. Criar User
-5. Criar Auth com JWT
+5. Criar Auth com token próprio via header
 6. Criar resposta JSON padronizada
 7. Criar tratamento global de erros
 ```
@@ -532,11 +607,10 @@ Antes de avancar para os CRUDs, confirme:
 - Migrations executam sem erro
 - User existe no banco
 - Registro funciona
-- Login retorna JWT
+- Login retorna token próprio
 - Endpoint /api/auth/me funciona autenticado
 - Respostas JSON seguem o padrao do projeto
 - Erros sao retornados em JSON
 - Rotas estao sob /api
 - CORS esta preparado para o frontend futuro
 ```
-
