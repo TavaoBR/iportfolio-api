@@ -350,7 +350,7 @@ Responsabilidades:
 
 ## 12. Criar entidades principais
 
-Depois da base de autenticação, crie as entidades do dominio:
+Depois da base de autenticação, crie as entidades do dominio usando o Symfony CLI/Maker:
 
 ```bash
 php bin/console make:entity UserProfile
@@ -366,7 +366,17 @@ php bin/console make:entity Template
 php bin/console make:entity AIAnalysis
 ```
 
-Depois gere e rode as migrations:
+Padrao do projeto:
+
+```md
+- Criar entidades com php bin/console make:entity
+- Criar usuario com php bin/console make:user
+- Gerar migrations com php bin/console make:migration
+- Revisar a migration gerada antes de executar
+- Executar migrations com php bin/console doctrine:migrations:migrate
+```
+
+Depois gere, revise e rode as migrations:
 
 ```bash
 php bin/console make:migration
