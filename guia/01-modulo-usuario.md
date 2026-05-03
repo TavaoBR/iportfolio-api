@@ -24,7 +24,8 @@ Leia e implemente nesta sequencia:
 9. guia/user/11-exceptions-e-response.md
 10. guia/user/07-service.md
 11. guia/user/08-controller.md
-12. guia/user/10-testes-e-validacao.md
+12. guia/user/12-tdd.md
+13. guia/user/10-testes-e-validacao.md
 ```
 
 ## Decisoes corrigidas

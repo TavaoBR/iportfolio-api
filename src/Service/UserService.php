@@ -1,41 +1,3 @@
-# Modulo User - Service
-
-## Objetivo
-
-O Service concentra regra de negocio do modulo User.
-
-Ele retorna sempre o padrao interno:
-
-```php
-return [
-    'status' => 201,
-    'message' => 'Conta criada com sucesso',
-    'data' => $data,
-];
-```
-
-## Arquivo
-
-```md
-src/Service/UserService.php
-```
-
-## Responsabilidades
-
-```md
-- Criar usuario
-- Validar email duplicado
-- Gerar hash de senha
-- Processar avatar base64
-- Atualizar usuario
-- Ativar/desativar usuario
-- Converter erros conhecidos em status/message
-- Converter erro inesperado em status 500
-```
-
-## Codigo completo
-
-```php
 <?php
 
 declare(strict_types=1);
@@ -73,18 +35,11 @@ final class UserService
                 throw new UserAlreadyExistsException('Usuario ja cadastrado');
             }
 
-            $user = new User(
-                name: $dto->name,
-                email: $dto->email,
-            );
-
-            $user->changePasswordHash(
-                $this->passwordHasher->hashPassword($user, $dto->password)
-            );
+            $user = new User($dto->name, $dto->email);
+            $user->changePasswordHash($this->passwordHasher->hashPassword($user, $dto->password));
 
             if ($dto->avatar !== null) {
-                $avatarPath = $this->avatarStorage->storeBase64($dto->avatar, $user);
-                $user->updateAvatar($avatarPath);
+                $user->updateAvatar($this->avatarStorage->storeBase64($dto->avatar));
             }
 
             $this->users->save($user);
@@ -94,14 +49,14 @@ final class UserService
                 'message' => 'Conta criada com sucesso',
                 'data' => $this->userMapper->toArray($user),
             ];
-        } catch (UserAlreadyExistsException $e) {
-            return [
-                'status' => Response::HTTP_CONFLICT,
-                'message' => $e->getMessage(),
-            ];
         } catch (InvalidAvatarException $e) {
             return [
                 'status' => Response::HTTP_UNPROCESSABLE_ENTITY,
+                'message' => $e->getMessage(),
+            ];
+        } catch (UserAlreadyExistsException $e) {
+            return [
+                'status' => Response::HTTP_CONFLICT,
                 'message' => $e->getMessage(),
             ];
         } catch (\Exception $e) {
@@ -119,7 +74,11 @@ final class UserService
     public function show(int $id): array
     {
         try {
-            $user = $this->getById($id);
+            $user = $this->users->find($id);
+
+            if (!$user instanceof User) {
+                throw new UserNotFoundException('Usuario nao encontrado');
+            }
 
             return [
                 'status' => Response::HTTP_OK,
@@ -139,32 +98,28 @@ final class UserService
             ];
         }
     }
-
     /**
      * @return array{status: int, message: string, data?: array<string, mixed>, errors?: mixed}
      */
     public function update(int $id, UpdateUserDTO $dto): array
     {
         try {
-            $user = $this->getById($id);
+            $user = $this->users->find($id);
+
+            if (!$user instanceof User) {
+                throw new UserNotFoundException('Usuario nao encontrado');
+            }
 
             if ($dto->name !== null) {
                 $user->updateName($dto->name);
             }
 
-            if ($dto->email !== null && mb_strtolower(trim($dto->email)) !== $user->getEmail()) {
-                if ($this->users->existsByEmail($dto->email, $user->getId())) {
-                    throw new UserAlreadyExistsException('Usuario ja cadastrado');
-                }
-
+            if ($dto->email !== null) {
                 $user->updateEmail($dto->email);
             }
 
             if ($dto->avatar !== null) {
-                $oldAvatar = $user->getAvatar();
-                $newAvatar = $this->avatarStorage->storeBase64($dto->avatar, $user);
-                $user->updateAvatar($newAvatar);
-                $this->avatarStorage->remove($oldAvatar);
+                $user->updateAvatar($this->avatarStorage->storeBase64($dto->avatar));
             }
 
             $this->users->save($user);
@@ -177,11 +132,6 @@ final class UserService
         } catch (UserNotFoundException $e) {
             return [
                 'status' => Response::HTTP_NOT_FOUND,
-                'message' => $e->getMessage(),
-            ];
-        } catch (UserAlreadyExistsException $e) {
-            return [
-                'status' => Response::HTTP_CONFLICT,
                 'message' => $e->getMessage(),
             ];
         } catch (InvalidAvatarException $e) {
@@ -197,7 +147,6 @@ final class UserService
             ];
         }
     }
-
     /**
      * @return array{status: int, message: string, data?: array<string, mixed>, errors?: mixed}
      */
@@ -214,38 +163,29 @@ final class UserService
         return $this->changeActiveStatus($id, false);
     }
 
-    private function getById(int $id): User
-    {
-        $user = $this->users->find($id);
-
-        if (!$user instanceof User) {
-            throw new UserNotFoundException('Usuario nao encontrado');
-        }
-
-        return $user;
-    }
-
     /**
      * @return array{status: int, message: string, data?: array<string, mixed>, errors?: mixed}
      */
     private function changeActiveStatus(int $id, bool $active): array
     {
         try {
-            $user = $this->getById($id);
+            $user = $this->users->find($id);
+
+            if (!$user instanceof User) {
+                throw new UserNotFoundException('Usuario nao encontrado');
+            }
 
             if ($active) {
                 $user->activate();
-                $message = 'Usuario ativado com sucesso';
             } else {
                 $user->deactivate();
-                $message = 'Usuario desativado com sucesso';
             }
 
             $this->users->save($user);
 
             return [
                 'status' => Response::HTTP_OK,
-                'message' => $message,
+                'message' => $active ? 'Usuario ativado com sucesso' : 'Usuario desativado com sucesso',
                 'data' => $this->userMapper->toArray($user),
             ];
         } catch (UserNotFoundException $e) {
@@ -262,39 +202,4 @@ final class UserService
         }
     }
 }
-```
 
-
-## Decisao sobre usuario autenticado
-
-Os metodos atuais que recebem `int $id` existem para permitir TDD e evolucao do modulo antes do Auth.
-
-Quando o modulo Auth estiver pronto, o fluxo oficial para operacoes do proprio usuario deve ser:
-
-```md
-Token proprio -> metadata -> userId -> UserService
-```
-
-O frontend/API client nao deve enviar o id do usuario para atualizar perfil, avatar ou desativar conta.
-
-Exemplo de assinatura futura aceitavel:
-
-```php
-public function showAuthenticated(int $authenticatedUserId): array
-public function updateAuthenticated(int $authenticatedUserId, UpdateUserDTO $dto): array
-public function deactivateAuthenticated(int $authenticatedUserId): array
-```
-
-O controller autenticado sera responsavel por obter esse id do contexto de autenticacao, nao da rota.
-
-## Decisoes
-
-```md
-- Service retorna array, nao Entity.
-- Controller nao decide status HTTP.
-- Email duplicado vira UserAlreadyExistsException.
-- Usuario ausente vira UserNotFoundException.
-- Avatar invalido vira InvalidAvatarException.
-- Hash de senha fica no Service.
-- Avatar base64 e delegado ao AvatarStorageService.
-```

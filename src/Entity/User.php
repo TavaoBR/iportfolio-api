@@ -47,13 +47,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $attempts = 1;
+    #[ORM\Column(options: ['default' => 0])]
+    private int $attempts = 0;
 
-    public function __construct(
-        string $name,
-        string $email,
-    ) {
+    public function __construct(string $name, string $email)
+    {
         $this->name = trim($name);
         $this->email = mb_strtolower(trim($email));
         $this->createdAt = new \DateTimeImmutable();
@@ -164,20 +162,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->updatedAt;
     }
 
-    private function touch(): void
-    {
-        $this->updatedAt = new \DateTimeImmutable();
-    }
-
-    public function getAttempts(): ?int
+    public function getAttempts(): int
     {
         return $this->attempts;
     }
 
-    public function setAttempts(?int $attempts): static
+    public function setAttempts(int $attempts): static
     {
         $this->attempts = $attempts;
+        $this->touch();
 
         return $this;
+    }
+
+    public function registerFailedLoginAttempt(): void
+    {
+        $this->attempts++;
+        $this->touch();
+    }
+
+    private function touch(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }

@@ -59,6 +59,41 @@ O usuario pode criar conta sem avatar.
 Se enviar avatar no cadastro, o backend ja processa e salva.
 ```
 
+
+## Modelo de acesso e ownership
+
+O modulo User nao deve ser tratado como CRUD administrativo.
+
+Regra oficial do projeto:
+
+```md
+- Nao existe listagem publica de todos os usuarios.
+- Nao existe role de admin por enquanto.
+- Endpoints autenticados devem operar sobre o proprio usuario autenticado.
+- O id do usuario deve vir do metadata/contexto de autenticacao, nao da URL.
+- Evitar endpoints como /api/users/{id} para operacoes do proprio usuario depois que Auth existir.
+```
+
+Exemplos de endpoints finais esperados apos o modulo Auth:
+
+```md
+GET /api/me
+PATCH /api/me
+PATCH /api/me/avatar
+PATCH /api/me/deactivate
+```
+
+Endpoints com `/{id}` podem existir temporariamente durante desenvolvimento e TDD antes do Auth, mas nao sao o contrato final para areas autenticadas.
+
+Motivo:
+
+```md
+- Impede que um usuario tente acessar ou alterar outro usuario pela URL.
+- Reduz risco de IDOR (Insecure Direct Object Reference).
+- Mantem ownership centralizado no contexto de autenticacao.
+- Simplifica controllers autenticados: eles nao recebem userId externo.
+```
+
 ## Padrao de camadas
 
 ```md
@@ -114,4 +149,5 @@ UserNotFoundException -> 404
 InvalidAvatarException -> 422
 AvatarUploadException -> 500
 ```
+
 

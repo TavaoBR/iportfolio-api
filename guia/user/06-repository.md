@@ -13,7 +13,6 @@ src/Repository/UserRepository.php
 - Persistir e remover User
 - Buscar por email
 - Verificar duplicidade de email
-- Criar consultas otimizadas para listagens futuras
 ```
 
 Repository nao deve:
@@ -112,9 +111,8 @@ final class UserRepository extends ServiceEntityRepository
 ```md
 - Use QueryBuilder para consultas que podem evoluir.
 - Use find() apenas para busca simples por id.
-- Nao retorne password em listagens futuras.
-- Em listagens, use paginacao.
-- Em listagens, use select parcial para evitar over-fetching.
+- Nao criar listagem de usuarios sem uma necessidade real e autorizada pelo produto.
+- Para endpoints do proprio usuario, buscar pelo id vindo do metadata de autenticacao.
 - Nao faca JOIN FETCH sem necessidade.
 ```
 
@@ -133,3 +131,18 @@ PortfolioSite
 
 as queries devem ser pensadas para cada tela. Nem toda response precisa carregar tudo.
 
+
+## Decisao sobre listagem
+
+Nao implementar `findAll`, paginacao ou endpoint de listagem de usuarios neste modulo.
+
+Como nao existe role de admin por enquanto, o repository deve focar em consultas necessarias para:
+
+```md
+- Cadastro
+- Login futuro
+- Validacao de email duplicado
+- Busca do usuario autenticado pelo id vindo do metadata
+```
+
+Quando o modulo Auth existir, operacoes autenticadas devem receber o id do usuario pelo contexto/token proprio, nao por parametro publico de rota.

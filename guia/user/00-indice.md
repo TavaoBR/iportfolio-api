@@ -15,7 +15,8 @@ O modulo User deve ser documentado e implementado por partes, seguindo esta orde
 8. 11-exceptions-e-response.md
 9. 07-service.md
 10. 08-controller.md
-11. 10-testes-e-validacao.md
+11. 12-tdd.md
+12. 10-testes-e-validacao.md
 ```
 
 ## Ordem correta de implementacao
@@ -32,7 +33,8 @@ O modulo User deve ser documentado e implementado por partes, seguindo esta orde
 9. Criar Exceptions e ApiResponseService
 10. Criar UserService
 11. Criar UserController
-12. Validar rotas, container e schema
+12. Seguir ciclos TDD em 12-tdd.md
+13. Validar rotas, container e schema
 ```
 
 ## Decisoes oficiais

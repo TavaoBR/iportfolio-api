@@ -83,6 +83,24 @@ CREATE TABLE users (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
 ```
 
+
+## Decisao sobre roles
+
+Nao existe role de admin por enquanto.
+
+Se a Entity foi criada com `make:user`, o Symfony pode gerar o campo tecnico `roles` e o metodo `getRoles()` por causa da interface `UserInterface`.
+
+Regra do projeto:
+
+```md
+- Nao criar endpoints administrativos baseados em ROLE_ADMIN.
+- Nao listar todos os usuarios.
+- Nao usar roles como regra de produto neste momento.
+- Operacoes autenticadas devem usar o usuario vindo do metadata do token proprio.
+```
+
+O `ROLE_USER`, se existir no codigo por compatibilidade com Symfony Security, deve ser tratado apenas como detalhe tecnico ate o modulo Auth definir melhor a autenticacao.
+
 ## Decisao sobre avatar
 
 O banco nao deve guardar o base64.

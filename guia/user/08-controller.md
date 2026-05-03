@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Controller expõe endpoints HTTP e deve ser fino.
+Controller expoe endpoints HTTP e deve ser fino.
 
 Ele nao contem regra de negocio.
 
@@ -101,7 +101,9 @@ final class UserController extends AbstractController
 }
 ```
 
-## Endpoints iniciais
+## Endpoints temporarios antes do Auth
+
+Enquanto o modulo Auth ainda nao existe, estes endpoints podem ser usados para TDD e validacao do modulo User:
 
 ```md
 POST /api/users
@@ -112,24 +114,53 @@ PATCH /api/users/{id}/activate
 PATCH /api/users/{id}/deactivate
 ```
 
+Eles nao representam o contrato final para operacoes autenticadas.
+
+## Contrato final apos Auth
+
+Depois que o token proprio com metadata estiver implementado, endpoints autenticados devem operar sobre o usuario do metadata:
+
+```md
+GET /api/me
+PATCH /api/me
+PATCH /api/me/avatar
+PATCH /api/me/deactivate
+```
+
+O controller autenticado nao deve receber `{id}` para alterar dados do proprio usuario. O id deve vir do contexto de autenticacao.
+
 ## Endpoints futuros
 
 Depois do modulo Auth:
 
 ```md
 POST /api/auth/register
-GET /api/auth/me
-PUT /api/me
+GET /api/me
+PATCH /api/me
+PATCH /api/me/avatar
+PATCH /api/me/deactivate
 ```
 
 ## Decisao
 
-O endpoint `POST /api/users` pode existir no inicio para desenvolvimento.
+O endpoint `POST /api/users` e endpoints com `/{id}` podem existir no inicio para desenvolvimento e testes antes do Auth.
 
 Quando Auth estiver pronto, cadastro publico deve ficar em:
 
 ```md
 POST /api/auth/register
+```
+
+## Regra de seguranca
+
+Nao criar endpoint `GET /api/users` para listar todos os usuarios.
+
+Nao usar `PATCH /api/users/{id}` como endpoint final para editar o proprio usuario autenticado. Esse formato permite passar ids externos pela URL e abre margem para IDOR se alguma validacao falhar.
+
+O padrao final e sempre:
+
+```md
+Controller -> AuthContext/metadata -> UserService
 ```
 
 ## Exemplo de response
