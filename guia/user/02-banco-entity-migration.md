@@ -1,3 +1,115 @@
+# Modulo User - Banco, Entity e Migration
+
+## Objetivo
+
+Criar a persistencia do usuario usando Symfony CLI/Maker e Doctrine.
+
+A Entity representa estado persistido. Ela nao deve gerar token, validar request, processar upload ou montar resposta HTTP.
+
+## Passo a passo via CLI
+
+Criar usuario com o Maker:
+
+```bash
+php bin/console make:user
+```
+
+Respostas recomendadas:
+
+```md
+Class name: User
+Store users in database: yes
+Unique property: email
+Security user provider: Doctrine
+Password hashed: yes
+```
+
+Adicionar campos extras:
+
+```bash
+php bin/console make:entity User
+```
+
+Campos:
+
+```md
+name: string, length 150, nullable false
+avatar: string, length 255, nullable true
+isActive: boolean, nullable false
+createdAt: datetime_immutable, nullable false
+updatedAt: datetime_immutable, nullable true
+```
+
+Gerar migration:
+
+```bash
+php bin/console make:migration
+```
+
+Revisar migration gerada:
+
+```bash
+Get-Content migrations\Version*.php
+```
+
+Executar migration:
+
+```bash
+php bin/console doctrine:migrations:migrate
+```
+
+Validar schema:
+
+```bash
+php bin/console doctrine:schema:validate
+```
+
+## Tabela esperada
+
+```sql
+CREATE TABLE users (
+    id INT AUTO_INCREMENT NOT NULL,
+    email VARCHAR(180) NOT NULL,
+    roles JSON NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    name VARCHAR(150) NOT NULL,
+    avatar VARCHAR(255) DEFAULT NULL,
+    is_active TINYINT(1) NOT NULL,
+    created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+    updated_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)',
+    UNIQUE INDEX UNIQ_IDENTIFIER_EMAIL (email),
+    INDEX idx_users_is_active (is_active),
+    PRIMARY KEY(id)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+```
+
+## Decisao sobre avatar
+
+O banco nao deve guardar o base64.
+
+O banco guarda apenas o caminho relativo do arquivo:
+
+```md
+uploads/avatars/avatar_abc123.png
+```
+
+Motivo:
+
+```md
+- Base64 no banco aumenta o tamanho dos dados.
+- Arquivos estaticos sao mais faceis de servir e cachear.
+- Fica mais simples trocar para S3, CDN ou outro storage no futuro.
+```
+
+## Entity completa
+
+Arquivo:
+
+```md
+src/Entity/User.php
+```
+
+```php
 <?php
 
 declare(strict_types=1);
@@ -47,13 +159,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $attempts = 1;
-
-    public function __construct(
-        string $name,
-        string $email,
-    ) {
+    public function __construct(string $name, string $email)
+    {
         $this->name = trim($name);
         $this->email = mb_strtolower(trim($email));
         $this->createdAt = new \DateTimeImmutable();
@@ -168,16 +275,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->updatedAt = new \DateTimeImmutable();
     }
-
-    public function getAttempts(): ?int
-    {
-        return $this->attempts;
-    }
-
-    public function setAttempts(?int $attempts): static
-    {
-        $this->attempts = $attempts;
-
-        return $this;
-    }
 }
+```
+
+## Relacionamentos futuros
+
+Nao criar ainda:
+
+```md
+User 1:1 UserProfile
+User 1:N Resume
+User 1:N Project
+User 1:N PortfolioSite
+User 1:N AuthToken
+```
+
+Cada relacionamento deve nascer no guia do modulo correspondente.

@@ -285,7 +285,6 @@ O endpoint de login deve retornar o token próprio:
 
 ```json
 {
-  "success": true,
   "message": "Login realizado com sucesso.",
   "data": {
     "token": "token_gerado_no_login",
@@ -304,32 +303,79 @@ X-Portfolio-Token: token_gerado_no_login
 
 ## 10. Padronizar respostas JSON
 
-Crie uma classe para respostas da API:
+O projeto usa um padrao em que os Services retornam um array interno com `status`, `message` e, quando necessario, `data` ou `errors`.
+
+Exemplo de sucesso no Service:
+
+```php
+return [
+    'status' => 201,
+    'message' => 'Conta criada com sucesso',
+];
+```
+
+Exemplo de sucesso com dados:
+
+```php
+return [
+    'status' => 200,
+    'message' => 'Usuario encontrado com sucesso',
+    'data' => $data,
+];
+```
+
+Exemplo de erro conhecido:
+
+```php
+return [
+    'status' => 409,
+    'message' => 'Usuario ja cadastrado',
+];
+```
+
+Exemplo de erro inesperado:
+
+```php
+return [
+    'status' => 500,
+    'message' => 'Ocorreu algum erro inesperado',
+    'errors' => $e->getMessage(),
+];
+```
+
+Crie uma classe para converter esse retorno em JSON:
 
 ```md
 src/Service/ApiResponseService.php
 ```
 
-Formato de sucesso:
+Formato HTTP de sucesso:
 
 ```json
 {
-  "success": true,
   "message": "Operacao realizada com sucesso.",
   "data": {}
 }
 ```
 
-Formato de erro:
+Formato HTTP de erro:
 
 ```json
 {
-  "success": false,
   "message": "Dados invalidos.",
   "errors": []
 }
 ```
 
+Regras oficiais:
+
+```md
+- Service retorna array com status/message/data/errors; o body HTTP nao inclui success.
+- Controller apenas transforma esse array em JsonResponse.
+- Exceptions proprias identificam erros conhecidos.
+- Controller nao deve conter regra de negocio nem try/catch de dominio.
+- O status fica no retorno interno e vira HTTP status code.
+```
 ## 11. Criar tratamento global de erros
 
 Crie um subscriber/listener para padronizar erros:
@@ -341,11 +387,12 @@ php bin/console make:subscriber ExceptionSubscriber
 Responsabilidades:
 
 ```md
-- Converter excecoes em JSON
+- Servir como fallback para excecoes que escaparem dos Services
 - Tratar erro de validacao
 - Tratar recurso nao encontrado
 - Tratar acesso negado
 - Evitar expor detalhes internos em producao
+- Manter consistencia com o padrao status/message/data/errors
 ```
 
 ## 12. Criar entidades principais
