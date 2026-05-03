@@ -105,6 +105,57 @@ final class LoginSession
         return $this->revokedAt;
     }
 
+    public function setUserId(int $userId): static
+    {
+        $this->userId = $userId;
+
+        return $this;
+    }
+
+    public function setLoginDateTime(\DateTimeImmutable $loginDateTime): static
+    {
+        $this->loginDateTime = $loginDateTime;
+
+        return $this;
+    }
+
+    public function setExpireDateTime(\DateTimeImmutable $expireDateTime): static
+    {
+        $this->expireDateTime = $expireDateTime;
+
+        return $this;
+    }
+
+    public function setIp(?string $ip): static
+    {
+        $this->ip = $ip !== null ? trim($ip) : null;
+
+        return $this;
+    }
+
+    public function setTokenHash(string $tokenHash): static
+    {
+        $this->tokenHash = $tokenHash;
+
+        return $this;
+    }
+
+    /**
+     * @param array<string, mixed> $sessionMetadata
+     */
+    public function setSessionMetadata(array $sessionMetadata): static
+    {
+        $this->sessionMetadata = $sessionMetadata;
+
+        return $this;
+    }
+
+    public function setRevokedAt(?\DateTimeImmutable $revokedAt): static
+    {
+        $this->revokedAt = $revokedAt;
+
+        return $this;
+    }
     public function revoke(\DateTimeImmutable $revokedAt): void
     {
         $this->revokedAt = $revokedAt;

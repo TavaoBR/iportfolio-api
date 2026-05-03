@@ -125,6 +125,77 @@ final class UserProfile
         return $this->updatedAt;
     }
 
+    public function setHeadline(?string $headline): static
+    {
+        $this->headline = $this->normalize($headline);
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setBio(?string $bio): static
+    {
+        $this->bio = $this->normalize($bio);
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $this->normalize($phone);
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setCity(?string $city): static
+    {
+        $this->city = $this->normalize($city);
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setState(?string $state): static
+    {
+        $this->state = $this->normalize($state);
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setCountry(?string $country): static
+    {
+        $this->country = $this->normalize($country);
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setLinkedinUrl(?string $linkedinUrl): static
+    {
+        $this->linkedinUrl = $this->normalize($linkedinUrl);
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setGithubUrl(?string $githubUrl): static
+    {
+        $this->githubUrl = $this->normalize($githubUrl);
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setWebsiteUrl(?string $websiteUrl): static
+    {
+        $this->websiteUrl = $this->normalize($websiteUrl);
+        $this->touch();
+
+        return $this;
+    }
     public function update(
         ?string $headline,
         ?string $bio,

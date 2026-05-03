@@ -112,6 +112,53 @@ final class Resume
         return $this->updatedAt;
     }
 
+    public function setTitle(string $title): static
+    {
+        $this->title = trim($title);
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setTargetRole(?string $targetRole): static
+    {
+        $this->targetRole = $this->normalize($targetRole);
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setLanguage(string $language): static
+    {
+        $this->language = $language;
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setAtsScore(?int $atsScore): static
+    {
+        $this->atsScore = $atsScore;
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setIsMain(bool $isMain): static
+    {
+        $this->isMain = $isMain;
+        $this->touch();
+
+        return $this;
+    }
+
+    public function setIsPublic(bool $isPublic): static
+    {
+        $this->isPublic = $isPublic;
+        $this->touch();
+
+        return $this;
+    }
     public function updateDraft(
         string $title,
         ?string $targetRole,
