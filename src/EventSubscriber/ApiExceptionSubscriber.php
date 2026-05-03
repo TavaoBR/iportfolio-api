@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber;
 
+use App\Exception\Auth\InvalidAuthTokenException;
+use App\Exception\Auth\MissingAuthTokenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 final class ApiExceptionSubscriber implements EventSubscriberInterface
 {
@@ -23,6 +25,15 @@ final class ApiExceptionSubscriber implements EventSubscriberInterface
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
+
+        if ($exception instanceof MissingAuthTokenException || $exception instanceof InvalidAuthTokenException) {
+            $event->setResponse(new JsonResponse([
+                'message' => $exception->getMessage(),
+            ], JsonResponse::HTTP_UNAUTHORIZED));
+
+            return;
+        }
+
         $validationException = $this->findValidationException($exception);
 
         if (!$validationException instanceof ValidationFailedException) {
