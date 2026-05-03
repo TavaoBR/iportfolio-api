@@ -33,16 +33,9 @@ final class AuthenticatedUserService
     public function me(Request $request): array
     {
         try {
-            $session = $this->sessionFromRequest($request);
-            $user = $this->userFromSession($session);
-            $userData = $this->userMapper->toArray($user);
-            $userData['session_metadata'] = $session->getSessionMetadata();
+            $authContext = $this->authenticate($request);
 
-            return [
-                'status' => Response::HTTP_OK,
-                'message' => 'Usuario autenticado encontrado com sucesso',
-                'data' => $userData,
-            ];
+            return $this->meFromAuthenticatedContext($authContext['user'], $authContext['session']);
         } catch (MissingAuthTokenException|InvalidAuthTokenException $e) {
             return [
                 'status' => Response::HTTP_UNAUTHORIZED,
@@ -60,18 +53,33 @@ final class AuthenticatedUserService
     /**
      * @return array{status: int, message: string, data?: array<string, mixed>, errors?: mixed}
      */
-    public function logout(Request $request): array
+    public function meFromAuthenticatedContext(User $user, LoginSession $session): array
     {
         try {
-            $session = $this->sessionFromRequest($request);
-            $session->revoke(new \DateTimeImmutable());
-
-            $this->sessions->save($session);
+            $userData = $this->userMapper->toArray($user);
+            $userData['session_metadata'] = $session->getSessionMetadata();
 
             return [
                 'status' => Response::HTTP_OK,
-                'message' => 'Logout realizado com sucesso',
+                'message' => 'Usuario autenticado encontrado com sucesso',
+                'data' => $userData,
             ];
+        } catch (\Exception $e) {
+            return [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'message' => 'Ocorreu algum erro inesperado',
+                'errors' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * @return array{status: int, message: string, data?: array<string, mixed>, errors?: mixed}
+     */
+    public function logout(Request $request): array
+    {
+        try {
+            return $this->logoutFromAuthenticatedSession($this->authenticate($request)['session']);
         } catch (MissingAuthTokenException|InvalidAuthTokenException $e) {
             return [
                 'status' => Response::HTTP_UNAUTHORIZED,
@@ -86,9 +94,44 @@ final class AuthenticatedUserService
         }
     }
 
+    /**
+     * @return array{status: int, message: string, data?: array<string, mixed>, errors?: mixed}
+     */
+    public function logoutFromAuthenticatedSession(LoginSession $session): array
+    {
+        try {
+            $session->revoke(new \DateTimeImmutable());
+            $this->sessions->save($session);
+
+            return [
+                'status' => Response::HTTP_OK,
+                'message' => 'Logout realizado com sucesso',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'message' => 'Ocorreu algum erro inesperado',
+                'errors' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * @return array{user: User, session: LoginSession}
+     */
+    public function authenticate(Request $request): array
+    {
+        $session = $this->sessionFromRequest($request);
+
+        return [
+            'user' => $this->userFromSession($session),
+            'session' => $session,
+        ];
+    }
+
     public function userFromRequest(Request $request): User
     {
-        return $this->userFromSession($this->sessionFromRequest($request));
+        return $this->authenticate($request)['user'];
     }
 
     private function sessionFromRequest(Request $request): LoginSession

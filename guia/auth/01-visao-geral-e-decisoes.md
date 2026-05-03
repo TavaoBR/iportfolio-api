@@ -72,3 +72,21 @@ Motivo:
 - Separar dados permanentes do usuario de dados temporarios de autenticacao.
 - Permitir multiplas sessoes por usuario no futuro.
 ```
+## Middleware de autenticacao
+
+Endpoints protegidos devem usar o atributo:
+
+```php
+#[RequiresAuth]
+```
+
+O middleware `RequiresAuthMiddleware` valida o header `X-Token-CV` antes do controller executar.
+
+Quando o token e valido, ele injeta no Request:
+
+```md
+authenticated_user
+login_session
+```
+
+Controllers protegidos nao devem buscar usuario por `{id}` nem validar token manualmente. Eles devem consumir o usuario/sessao ja resolvidos pelo middleware.

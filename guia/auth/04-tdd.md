@@ -20,3 +20,12 @@ Fluxo:
 ```md
 Request -> X-Token-CV -> AuthenticatedUserService -> UserService do modulo especifico
 ```
+## Padrao para endpoints protegidos
+
+Novos endpoints autenticados devem testar o comportamento via HTTP e usar `#[RequiresAuth]` no controller.
+
+Fluxo esperado:
+
+```md
+Request -> RequiresAuthMiddleware -> authenticated_user/login_session -> Controller -> Service
+```

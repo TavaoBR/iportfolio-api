@@ -59,3 +59,12 @@ Motivo:
 - Mantem ownership no contexto de autenticacao.
 - O frontend nao precisa conhecer/enviar user_id.
 ```
+## Middleware
+
+`ProfileController` deve ser protegido com:
+
+```php
+#[RequiresAuth]
+```
+
+O usuario usado pelo service vem de `authenticated_user` no Request, preenchido pelo middleware de autenticacao.
