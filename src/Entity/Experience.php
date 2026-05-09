@@ -59,19 +59,20 @@ final class Experience
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function getId(): ?int { return $this->id; }
-    public function getCompany(): string { return $this->company; }
-    public function getRole(): string { return $this->role; }
-    public function getDescription(): ?string { return $this->description; }
-    public function getLocation(): ?string { return $this->location; }
-    public function getStartDate(): ?\DateTimeImmutable { return $this->startDate; }
-    public function getEndDate(): ?\DateTimeImmutable { return $this->endDate; }
-    public function isCurrent(): bool { return $this->isCurrent; }
-    public function getSortOrder(): int { return $this->sortOrder; }
-    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
-    public function getUpdatedAt(): ?\DateTimeImmutable { return $this->updatedAt; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getUser(): User { return $this->user; }
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function getCompany(): string
+    {
+        return $this->company;
+    }
 
     public function setCompany(string $company): static
     {
@@ -79,6 +80,11 @@ final class Experience
         $this->touch();
 
         return $this;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
     }
 
     public function setRole(string $role): static
@@ -89,12 +95,22 @@ final class Experience
         return $this;
     }
 
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
     public function setDescription(?string $description): static
     {
         $this->description = $this->normalize($description);
         $this->touch();
 
         return $this;
+    }
+
+    public function getLocation(): ?string
+    {
+        return $this->location;
     }
 
     public function setLocation(?string $location): static
@@ -105,6 +121,11 @@ final class Experience
         return $this;
     }
 
+    public function getStartDate(): ?\DateTimeImmutable
+    {
+        return $this->startDate;
+    }
+
     public function setStartDate(?\DateTimeImmutable $startDate): static
     {
         $this->startDate = $startDate;
@@ -113,12 +134,22 @@ final class Experience
         return $this;
     }
 
+    public function getEndDate(): ?\DateTimeImmutable
+    {
+        return $this->endDate;
+    }
+
     public function setEndDate(?\DateTimeImmutable $endDate): static
     {
         $this->endDate = $this->isCurrent ? null : $endDate;
         $this->touch();
 
         return $this;
+    }
+
+    public function isCurrent(): bool
+    {
+        return $this->isCurrent;
     }
 
     public function setIsCurrent(bool $isCurrent): static
@@ -134,6 +165,11 @@ final class Experience
         return $this;
     }
 
+    public function getSortOrder(): int
+    {
+        return $this->sortOrder;
+    }
+
     public function setSortOrder(int $sortOrder): static
     {
         $this->sortOrder = $sortOrder;
@@ -142,8 +178,26 @@ final class Experience
         return $this;
     }
 
-    public function update(string $company, string $role, ?string $description, ?string $location, ?\DateTimeImmutable $startDate, ?\DateTimeImmutable $endDate, bool $isCurrent, int $sortOrder): void
+    public function getCreatedAt(): \DateTimeImmutable
     {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function update(
+        string $company,
+        string $role,
+        ?string $description,
+        ?string $location,
+        ?\DateTimeImmutable $startDate,
+        ?\DateTimeImmutable $endDate,
+        bool $isCurrent,
+        int $sortOrder,
+    ): void {
         $this->company = trim($company);
         $this->role = trim($role);
         $this->description = $this->normalize($description);
@@ -152,15 +206,20 @@ final class Experience
         $this->endDate = $isCurrent ? null : $endDate;
         $this->isCurrent = $isCurrent;
         $this->sortOrder = $sortOrder;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->touch();
     }
 
     private function normalize(?string $value): ?string
     {
-        if ($value === null) { return null; }
+        if ($value === null) {
+            return null;
+        }
+
         $value = trim($value);
+
         return $value !== '' ? $value : null;
     }
+
     private function touch(): void
     {
         $this->updatedAt = new \DateTimeImmutable();

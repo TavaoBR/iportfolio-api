@@ -41,4 +41,16 @@ final class CertificationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findOneOwnedByUser(User $user, int $id): ?Certification
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.id = :id')
+            ->andWhere('c.user = :user')
+            ->setParameter('id', $id)
+            ->setParameter('user', $user)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

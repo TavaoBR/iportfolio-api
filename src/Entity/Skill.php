@@ -46,15 +46,20 @@ final class Skill
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function getId(): ?int { return $this->id; }
-    public function getName(): string { return $this->name; }
-    public function getCategory(): ?string { return $this->category; }
-    public function getLevel(): ?string { return $this->level; }
-    public function getSortOrder(): int { return $this->sortOrder; }
-    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
-    public function getUpdatedAt(): ?\DateTimeImmutable { return $this->updatedAt; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getUser(): User { return $this->user; }
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
 
     public function setName(string $name): static
     {
@@ -62,6 +67,11 @@ final class Skill
         $this->touch();
 
         return $this;
+    }
+
+    public function getCategory(): ?string
+    {
+        return $this->category;
     }
 
     public function setCategory(?string $category): static
@@ -72,12 +82,22 @@ final class Skill
         return $this;
     }
 
+    public function getLevel(): ?string
+    {
+        return $this->level;
+    }
+
     public function setLevel(?string $level): static
     {
         $this->level = $this->normalize($level);
         $this->touch();
 
         return $this;
+    }
+
+    public function getSortOrder(): int
+    {
+        return $this->sortOrder;
     }
 
     public function setSortOrder(int $sortOrder): static
@@ -88,21 +108,36 @@ final class Skill
         return $this;
     }
 
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
     public function update(string $name, ?string $category, ?string $level, int $sortOrder): void
     {
         $this->name = trim($name);
         $this->category = $this->normalize($category);
         $this->level = $this->normalize($level);
         $this->sortOrder = $sortOrder;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->touch();
     }
 
     private function normalize(?string $value): ?string
     {
-        if ($value === null) { return null; }
+        if ($value === null) {
+            return null;
+        }
+
         $value = trim($value);
+
         return $value !== '' ? $value : null;
     }
+
     private function touch(): void
     {
         $this->updatedAt = new \DateTimeImmutable();

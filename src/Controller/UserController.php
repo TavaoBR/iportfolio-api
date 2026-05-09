@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Attribute\PublicRoute;
 use App\DTO\User\CreateUserDTO;
 use App\DTO\User\UpdateUserDTO;
 use App\Service\ApiResponseService;
@@ -13,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[PublicRoute]
 #[Route('/api/users')]
 final class UserController extends AbstractController
 {

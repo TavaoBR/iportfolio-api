@@ -52,17 +52,20 @@ final class Certification
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function getId(): ?int { return $this->id; }
-    public function getName(): string { return $this->name; }
-    public function getIssuer(): ?string { return $this->issuer; }
-    public function getCredentialUrl(): ?string { return $this->credentialUrl; }
-    public function getIssuedAt(): ?\DateTimeImmutable { return $this->issuedAt; }
-    public function getExpiresAt(): ?\DateTimeImmutable { return $this->expiresAt; }
-    public function getSortOrder(): int { return $this->sortOrder; }
-    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
-    public function getUpdatedAt(): ?\DateTimeImmutable { return $this->updatedAt; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getUser(): User { return $this->user; }
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
 
     public function setName(string $name): static
     {
@@ -70,6 +73,11 @@ final class Certification
         $this->touch();
 
         return $this;
+    }
+
+    public function getIssuer(): ?string
+    {
+        return $this->issuer;
     }
 
     public function setIssuer(?string $issuer): static
@@ -80,12 +88,22 @@ final class Certification
         return $this;
     }
 
+    public function getCredentialUrl(): ?string
+    {
+        return $this->credentialUrl;
+    }
+
     public function setCredentialUrl(?string $credentialUrl): static
     {
         $this->credentialUrl = $this->normalize($credentialUrl);
         $this->touch();
 
         return $this;
+    }
+
+    public function getIssuedAt(): ?\DateTimeImmutable
+    {
+        return $this->issuedAt;
     }
 
     public function setIssuedAt(?\DateTimeImmutable $issuedAt): static
@@ -96,12 +114,22 @@ final class Certification
         return $this;
     }
 
+    public function getExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->expiresAt;
+    }
+
     public function setExpiresAt(?\DateTimeImmutable $expiresAt): static
     {
         $this->expiresAt = $expiresAt;
         $this->touch();
 
         return $this;
+    }
+
+    public function getSortOrder(): int
+    {
+        return $this->sortOrder;
     }
 
     public function setSortOrder(int $sortOrder): static
@@ -112,23 +140,44 @@ final class Certification
         return $this;
     }
 
-    public function update(string $name, ?string $issuer, ?string $credentialUrl, ?\DateTimeImmutable $issuedAt, ?\DateTimeImmutable $expiresAt, int $sortOrder): void
+    public function getCreatedAt(): \DateTimeImmutable
     {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function update(
+        string $name,
+        ?string $issuer,
+        ?string $credentialUrl,
+        ?\DateTimeImmutable $issuedAt,
+        ?\DateTimeImmutable $expiresAt,
+        int $sortOrder,
+    ): void {
         $this->name = trim($name);
         $this->issuer = $this->normalize($issuer);
         $this->credentialUrl = $this->normalize($credentialUrl);
         $this->issuedAt = $issuedAt;
         $this->expiresAt = $expiresAt;
         $this->sortOrder = $sortOrder;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->touch();
     }
 
     private function normalize(?string $value): ?string
     {
-        if ($value === null) { return null; }
+        if ($value === null) {
+            return null;
+        }
+
         $value = trim($value);
+
         return $value !== '' ? $value : null;
     }
+
     private function touch(): void
     {
         $this->updatedAt = new \DateTimeImmutable();

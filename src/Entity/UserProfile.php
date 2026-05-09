@@ -75,9 +75,25 @@ final class UserProfile
         return $this->headline;
     }
 
+    public function setHeadline(?string $headline): static
+    {
+        $this->headline = $this->normalize($headline);
+        $this->touch();
+
+        return $this;
+    }
+
     public function getBio(): ?string
     {
         return $this->bio;
+    }
+
+    public function setBio(?string $bio): static
+    {
+        $this->bio = $this->normalize($bio);
+        $this->touch();
+
+        return $this;
     }
 
     public function getPhone(): ?string
@@ -85,9 +101,25 @@ final class UserProfile
         return $this->phone;
     }
 
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $this->normalize($phone);
+        $this->touch();
+
+        return $this;
+    }
+
     public function getCity(): ?string
     {
         return $this->city;
+    }
+
+    public function setCity(?string $city): static
+    {
+        $this->city = $this->normalize($city);
+        $this->touch();
+
+        return $this;
     }
 
     public function getState(): ?string
@@ -95,9 +127,25 @@ final class UserProfile
         return $this->state;
     }
 
+    public function setState(?string $state): static
+    {
+        $this->state = $this->normalize($state);
+        $this->touch();
+
+        return $this;
+    }
+
     public function getCountry(): ?string
     {
         return $this->country;
+    }
+
+    public function setCountry(?string $country): static
+    {
+        $this->country = $this->normalize($country);
+        $this->touch();
+
+        return $this;
     }
 
     public function getLinkedinUrl(): ?string
@@ -105,14 +153,38 @@ final class UserProfile
         return $this->linkedinUrl;
     }
 
+    public function setLinkedinUrl(?string $linkedinUrl): static
+    {
+        $this->linkedinUrl = $this->normalize($linkedinUrl);
+        $this->touch();
+
+        return $this;
+    }
+
     public function getGithubUrl(): ?string
     {
         return $this->githubUrl;
     }
 
+    public function setGithubUrl(?string $githubUrl): static
+    {
+        $this->githubUrl = $this->normalize($githubUrl);
+        $this->touch();
+
+        return $this;
+    }
+
     public function getWebsiteUrl(): ?string
     {
         return $this->websiteUrl;
+    }
+
+    public function setWebsiteUrl(?string $websiteUrl): static
+    {
+        $this->websiteUrl = $this->normalize($websiteUrl);
+        $this->touch();
+
+        return $this;
     }
 
     public function getCreatedAt(): \DateTimeImmutable
@@ -125,77 +197,6 @@ final class UserProfile
         return $this->updatedAt;
     }
 
-    public function setHeadline(?string $headline): static
-    {
-        $this->headline = $this->normalize($headline);
-        $this->touch();
-
-        return $this;
-    }
-
-    public function setBio(?string $bio): static
-    {
-        $this->bio = $this->normalize($bio);
-        $this->touch();
-
-        return $this;
-    }
-
-    public function setPhone(?string $phone): static
-    {
-        $this->phone = $this->normalize($phone);
-        $this->touch();
-
-        return $this;
-    }
-
-    public function setCity(?string $city): static
-    {
-        $this->city = $this->normalize($city);
-        $this->touch();
-
-        return $this;
-    }
-
-    public function setState(?string $state): static
-    {
-        $this->state = $this->normalize($state);
-        $this->touch();
-
-        return $this;
-    }
-
-    public function setCountry(?string $country): static
-    {
-        $this->country = $this->normalize($country);
-        $this->touch();
-
-        return $this;
-    }
-
-    public function setLinkedinUrl(?string $linkedinUrl): static
-    {
-        $this->linkedinUrl = $this->normalize($linkedinUrl);
-        $this->touch();
-
-        return $this;
-    }
-
-    public function setGithubUrl(?string $githubUrl): static
-    {
-        $this->githubUrl = $this->normalize($githubUrl);
-        $this->touch();
-
-        return $this;
-    }
-
-    public function setWebsiteUrl(?string $websiteUrl): static
-    {
-        $this->websiteUrl = $this->normalize($websiteUrl);
-        $this->touch();
-
-        return $this;
-    }
     public function update(
         ?string $headline,
         ?string $bio,

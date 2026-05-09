@@ -33,12 +33,24 @@ final class ProjectRepository extends ServiceEntityRepository
      */
     public function findByUser(User $user): array
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.user = :user')
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('c.sortOrder', 'ASC')
-            ->addOrderBy('c.createdAt', 'DESC')
+            ->orderBy('p.sortOrder', 'ASC')
+            ->addOrderBy('p.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findOneOwnedByUser(User $user, int $id): ?Project
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.id = :id')
+            ->andWhere('p.user = :user')
+            ->setParameter('id', $id)
+            ->setParameter('user', $user)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

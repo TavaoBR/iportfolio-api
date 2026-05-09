@@ -33,12 +33,24 @@ final class ExperienceRepository extends ServiceEntityRepository
      */
     public function findByUser(User $user): array
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.user = :user')
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('c.sortOrder', 'ASC')
-            ->addOrderBy('c.createdAt', 'DESC')
+            ->orderBy('e.sortOrder', 'ASC')
+            ->addOrderBy('e.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findOneOwnedByUser(User $user, int $id): ?Experience
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.id = :id')
+            ->andWhere('e.user = :user')
+            ->setParameter('id', $id)
+            ->setParameter('user', $user)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

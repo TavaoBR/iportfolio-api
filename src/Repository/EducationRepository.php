@@ -33,12 +33,24 @@ final class EducationRepository extends ServiceEntityRepository
      */
     public function findByUser(User $user): array
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.user = :user')
+        return $this->createQueryBuilder('ed')
+            ->andWhere('ed.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('c.sortOrder', 'ASC')
-            ->addOrderBy('c.createdAt', 'DESC')
+            ->orderBy('ed.sortOrder', 'ASC')
+            ->addOrderBy('ed.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findOneOwnedByUser(User $user, int $id): ?Education
+    {
+        return $this->createQueryBuilder('ed')
+            ->andWhere('ed.id = :id')
+            ->andWhere('ed.user = :user')
+            ->setParameter('id', $id)
+            ->setParameter('user', $user)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

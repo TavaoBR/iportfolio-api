@@ -18,6 +18,10 @@ final readonly class UpdateUserDTO
         #[Assert\Length(max: 180, maxMessage: 'O email deve ter no maximo {{ limit }} caracteres')]
         public ?string $email = null,
 
+        #[Assert\Length(
+            max: 3_500_000,
+            maxMessage: 'O avatar excede o tamanho maximo permitido'
+        )]
         public ?string $avatar = null,
     ) {
     }

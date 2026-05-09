@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Attribute\PublicRoute;
 use App\Attribute\RequiresAuth;
 use App\DTO\Auth\LoginDTO;
 use App\Entity\LoginSession;
-use App\Middleware\Auth\RequiresAuthMiddleware;
-use App\Exception\Auth\InvalidAuthTokenException;
 use App\Service\ApiResponseService;
 use App\Service\Auth\AuthService;
 use App\Service\Auth\AuthenticatedUserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -28,6 +26,7 @@ final class AuthController extends AbstractController
     ) {
     }
 
+    #[PublicRoute]
     #[Route('/login', name: 'api_auth_login', methods: ['POST'])]
     public function login(#[MapRequestPayload] LoginDTO $dto): JsonResponse
     {
@@ -36,21 +35,10 @@ final class AuthController extends AbstractController
 
     #[RequiresAuth]
     #[Route('/logout', name: 'api_auth_logout', methods: ['POST'])]
-    public function logout(Request $request): JsonResponse
+    public function logout(LoginSession $session): JsonResponse
     {
         return $this->api->fromServiceResult(
-            $this->authenticatedUsers->logoutFromAuthenticatedSession($this->loginSession($request))
+            $this->authenticatedUsers->logoutFromAuthenticatedSession($session)
         );
-    }
-
-    private function loginSession(Request $request): LoginSession
-    {
-        $session = $request->attributes->get(RequiresAuthMiddleware::LOGIN_SESSION);
-
-        if (!$session instanceof LoginSession) {
-            throw new InvalidAuthTokenException();
-        }
-
-        return $session;
     }
 }

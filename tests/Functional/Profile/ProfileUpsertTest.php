@@ -17,7 +17,7 @@ final class ProfileUpsertTest extends WebTestCase
         $token = $this->login($client, 'profile-create@example.com');
 
         $client->request(
-            'PUT',
+            'POST',
             '/api/profile',
             server: [
                 'CONTENT_TYPE' => 'application/json',
@@ -56,7 +56,7 @@ final class ProfileUpsertTest extends WebTestCase
         $token = $this->login($client, 'profile-update@example.com');
 
         $client->request(
-            'PUT',
+            'POST',
             '/api/profile',
             server: [
                 'CONTENT_TYPE' => 'application/json',
@@ -99,6 +99,32 @@ final class ProfileUpsertTest extends WebTestCase
         self::assertSame('Brasil', $updated['data']['country']);
         self::assertArrayNotHasKey('success', $updated);
     }
+
+    public function testRejectsDuplicateProfileCreate(): void
+    {
+        $client = self::createClient();
+        $this->resetDatabase($client->getContainer()->get(EntityManagerInterface::class));
+        $token = $this->login($client, 'profile-duplicate@example.com');
+
+        $server = [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_X_TOKEN_CV' => $token,
+        ];
+
+        $client->request('POST', '/api/profile', server: $server, content: json_encode(['headline' => 'Primeiro'], JSON_THROW_ON_ERROR));
+
+        self::assertResponseStatusCodeSame(201);
+
+        $client->request('POST', '/api/profile', server: $server, content: json_encode(['headline' => 'Segundo'], JSON_THROW_ON_ERROR));
+
+        self::assertResponseStatusCodeSame(409);
+
+        $response = json_decode($client->getResponse()->getContent() ?: '', true, flags: JSON_THROW_ON_ERROR);
+
+        self::assertSame('Perfil ja cadastrado', $response['message']);
+    }
+
     private function login($client, string $email): string
     {
         $client->request(

@@ -21,7 +21,7 @@ final class UserService
         private readonly UserRepository $users,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly UserMapper $userMapper,
-        private readonly AvatarStorageService $avatarStorage,
+        private readonly AvatarBase64Service $avatarBase64,
     ) {
     }
 
@@ -39,7 +39,8 @@ final class UserService
             $user->changePasswordHash($this->passwordHasher->hashPassword($user, $dto->password));
 
             if ($dto->avatar !== null) {
-                $user->updateAvatar($this->avatarStorage->storeBase64($dto->avatar));
+                $this->avatarBase64->assertValid($dto->avatar);
+                $user->updateAvatar(trim($dto->avatar));
             }
 
             $this->users->save($user);
@@ -119,7 +120,8 @@ final class UserService
             }
 
             if ($dto->avatar !== null) {
-                $user->updateAvatar($this->avatarStorage->storeBase64($dto->avatar));
+                $this->avatarBase64->assertValid($dto->avatar);
+                $user->updateAvatar(trim($dto->avatar));
             }
 
             $this->users->save($user);

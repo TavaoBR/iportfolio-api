@@ -17,7 +17,7 @@ final class ProfileReadTest extends WebTestCase
         $token = $this->login($client, 'profile-read@example.com');
 
         $client->request(
-            'PUT',
+            'POST',
             '/api/profile',
             server: [
                 'CONTENT_TYPE' => 'application/json',

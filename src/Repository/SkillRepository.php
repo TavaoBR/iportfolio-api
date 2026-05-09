@@ -33,12 +33,24 @@ final class SkillRepository extends ServiceEntityRepository
      */
     public function findByUser(User $user): array
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.user = :user')
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('c.sortOrder', 'ASC')
-            ->addOrderBy('c.createdAt', 'DESC')
+            ->orderBy('s.sortOrder', 'ASC')
+            ->addOrderBy('s.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findOneOwnedByUser(User $user, int $id): ?Skill
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.id = :id')
+            ->andWhere('s.user = :user')
+            ->setParameter('id', $id)
+            ->setParameter('user', $user)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

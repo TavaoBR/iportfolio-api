@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\User;
 
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -117,12 +118,14 @@ final class CreateUserTest extends WebTestCase
 
         $response = json_decode($client->getResponse()->getContent() ?: '', true, flags: JSON_THROW_ON_ERROR);
 
+        $sentAvatar = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
         self::assertIsString($response['data']['avatar']);
-        self::assertStringStartsWith('uploads/avatars/', $response['data']['avatar']);
+        self::assertSame($sentAvatar, $response['data']['avatar']);
 
-        $storedPath = self::getContainer()->getParameter('kernel.project_dir') . '/var/test_uploads/avatars/' . basename($response['data']['avatar']);
-
-        self::assertFileExists($storedPath);
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $persisted = $em->find(User::class, $response['data']['id']);
+        self::assertInstanceOf(User::class, $persisted);
+        self::assertSame($sentAvatar, $persisted->getAvatar());
     }
     public function testRejectsInvalidAvatar(): void
     {

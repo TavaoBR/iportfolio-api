@@ -58,19 +58,20 @@ final class Education
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function getId(): ?int { return $this->id; }
-    public function getInstitution(): string { return $this->institution; }
-    public function getDegree(): ?string { return $this->degree; }
-    public function getFieldOfStudy(): ?string { return $this->fieldOfStudy; }
-    public function getDescription(): ?string { return $this->description; }
-    public function getStartDate(): ?\DateTimeImmutable { return $this->startDate; }
-    public function getEndDate(): ?\DateTimeImmutable { return $this->endDate; }
-    public function isCurrent(): bool { return $this->isCurrent; }
-    public function getSortOrder(): int { return $this->sortOrder; }
-    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
-    public function getUpdatedAt(): ?\DateTimeImmutable { return $this->updatedAt; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getUser(): User { return $this->user; }
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function getInstitution(): string
+    {
+        return $this->institution;
+    }
 
     public function setInstitution(string $institution): static
     {
@@ -78,6 +79,11 @@ final class Education
         $this->touch();
 
         return $this;
+    }
+
+    public function getDegree(): ?string
+    {
+        return $this->degree;
     }
 
     public function setDegree(?string $degree): static
@@ -88,12 +94,22 @@ final class Education
         return $this;
     }
 
+    public function getFieldOfStudy(): ?string
+    {
+        return $this->fieldOfStudy;
+    }
+
     public function setFieldOfStudy(?string $fieldOfStudy): static
     {
         $this->fieldOfStudy = $this->normalize($fieldOfStudy);
         $this->touch();
 
         return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
     }
 
     public function setDescription(?string $description): static
@@ -104,6 +120,11 @@ final class Education
         return $this;
     }
 
+    public function getStartDate(): ?\DateTimeImmutable
+    {
+        return $this->startDate;
+    }
+
     public function setStartDate(?\DateTimeImmutable $startDate): static
     {
         $this->startDate = $startDate;
@@ -112,12 +133,22 @@ final class Education
         return $this;
     }
 
+    public function getEndDate(): ?\DateTimeImmutable
+    {
+        return $this->endDate;
+    }
+
     public function setEndDate(?\DateTimeImmutable $endDate): static
     {
         $this->endDate = $this->isCurrent ? null : $endDate;
         $this->touch();
 
         return $this;
+    }
+
+    public function isCurrent(): bool
+    {
+        return $this->isCurrent;
     }
 
     public function setIsCurrent(bool $isCurrent): static
@@ -133,6 +164,11 @@ final class Education
         return $this;
     }
 
+    public function getSortOrder(): int
+    {
+        return $this->sortOrder;
+    }
+
     public function setSortOrder(int $sortOrder): static
     {
         $this->sortOrder = $sortOrder;
@@ -141,8 +177,26 @@ final class Education
         return $this;
     }
 
-    public function update(string $institution, ?string $degree, ?string $fieldOfStudy, ?string $description, ?\DateTimeImmutable $startDate, ?\DateTimeImmutable $endDate, bool $isCurrent, int $sortOrder): void
+    public function getCreatedAt(): \DateTimeImmutable
     {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function update(
+        string $institution,
+        ?string $degree,
+        ?string $fieldOfStudy,
+        ?string $description,
+        ?\DateTimeImmutable $startDate,
+        ?\DateTimeImmutable $endDate,
+        bool $isCurrent,
+        int $sortOrder,
+    ): void {
         $this->institution = trim($institution);
         $this->degree = $this->normalize($degree);
         $this->fieldOfStudy = $this->normalize($fieldOfStudy);
@@ -151,15 +205,20 @@ final class Education
         $this->endDate = $isCurrent ? null : $endDate;
         $this->isCurrent = $isCurrent;
         $this->sortOrder = $sortOrder;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->touch();
     }
 
     private function normalize(?string $value): ?string
     {
-        if ($value === null) { return null; }
+        if ($value === null) {
+            return null;
+        }
+
         $value = trim($value);
+
         return $value !== '' ? $value : null;
     }
+
     private function touch(): void
     {
         $this->updatedAt = new \DateTimeImmutable();

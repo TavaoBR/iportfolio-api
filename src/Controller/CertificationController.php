@@ -6,14 +6,12 @@ namespace App\Controller;
 
 use App\Attribute\RequiresAuth;
 use App\DTO\Certification\CreateCertificationDTO;
+use App\DTO\Certification\UpdateCertificationDTO;
 use App\Entity\User;
-use App\Exception\Auth\InvalidAuthTokenException;
-use App\Middleware\Auth\RequiresAuthMiddleware;
 use App\Service\ApiResponseService;
 use App\Service\CertificationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -28,29 +26,26 @@ final class CertificationController extends AbstractController
     }
 
     #[Route('', name: 'api_certifications_create', methods: ['POST'])]
-    public function create(Request $request, #[MapRequestPayload] CreateCertificationDTO $dto): JsonResponse
+    public function create(User $user, #[MapRequestPayload] CreateCertificationDTO $dto): JsonResponse
     {
         return $this->api->fromServiceResult(
-            $this->certifications->create($this->authenticatedUser($request), $dto)
+            $this->certifications->create($user, $dto)
+        );
+    }
+
+    #[Route('/{id<\d+>}', name: 'api_certifications_update', methods: ['PUT', 'PATCH'])]
+    public function update(User $user, int $id, #[MapRequestPayload] UpdateCertificationDTO $dto): JsonResponse
+    {
+        return $this->api->fromServiceResult(
+            $this->certifications->update($user, $id, $dto)
         );
     }
 
     #[Route('', name: 'api_certifications_list', methods: ['GET'])]
-    public function list(Request $request): JsonResponse
+    public function list(User $user): JsonResponse
     {
         return $this->api->fromServiceResult(
-            $this->certifications->list($this->authenticatedUser($request))
+            $this->certifications->list($user)
         );
-    }
-
-    private function authenticatedUser(Request $request): User
-    {
-        $user = $request->attributes->get(RequiresAuthMiddleware::AUTHENTICATED_USER);
-
-        if (!$user instanceof User) {
-            throw new InvalidAuthTokenException();
-        }
-
-        return $user;
     }
 }

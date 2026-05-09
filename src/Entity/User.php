@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -35,7 +36,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 150)]
     private string $name;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $avatar = null;
 
     #[ORM\Column(options: ['default' => true])]
@@ -67,10 +68,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function updateEmail(string $email): void
+    public function setEmail(string $email): static
     {
         $this->email = mb_strtolower(trim($email));
         $this->touch();
+
+        return $this;
+    }
+
+    public function updateEmail(string $email): void
+    {
+        $this->setEmail($email);
     }
 
     public function getUserIdentifier(): string
@@ -92,10 +100,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @param list<string> $roles
      */
-    public function setRoles(array $roles): void
+    public function setRoles(array $roles): static
     {
         $this->roles = array_values(array_unique($roles));
         $this->touch();
+
+        return $this;
     }
 
     public function getPassword(): string
@@ -103,10 +113,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function changePasswordHash(string $passwordHash): void
+    public function setPasswordHash(string $passwordHash): static
     {
         $this->password = $passwordHash;
         $this->touch();
+
+        return $this;
+    }
+
+    public function changePasswordHash(string $passwordHash): void
+    {
+        $this->setPasswordHash($passwordHash);
     }
 
     public function eraseCredentials(): void
@@ -118,10 +135,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->name;
     }
 
-    public function updateName(string $name): void
+    public function setName(string $name): static
     {
         $this->name = trim($name);
         $this->touch();
+
+        return $this;
+    }
+
+    public function updateName(string $name): void
+    {
+        $this->setName($name);
     }
 
     public function getAvatar(): ?string
@@ -129,10 +153,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->avatar;
     }
 
-    public function updateAvatar(?string $avatar): void
+    public function setAvatar(?string $avatar): static
     {
         $this->avatar = $avatar !== null ? trim($avatar) : null;
         $this->touch();
+
+        return $this;
+    }
+
+    public function updateAvatar(?string $avatar): void
+    {
+        $this->setAvatar($avatar);
     }
 
     public function isActive(): bool
@@ -140,16 +171,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->isActive;
     }
 
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+        $this->touch();
+
+        return $this;
+    }
+
     public function activate(): void
     {
-        $this->isActive = true;
-        $this->touch();
+        $this->setIsActive(true);
     }
 
     public function deactivate(): void
     {
-        $this->isActive = false;
-        $this->touch();
+        $this->setIsActive(false);
     }
 
     public function getCreatedAt(): \DateTimeImmutable

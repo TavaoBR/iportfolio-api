@@ -16,7 +16,7 @@ final class ProfileValidationTest extends WebTestCase
         $this->resetDatabase($client->getContainer()->get(EntityManagerInterface::class));
 
         $client->request(
-            'PUT',
+            'POST',
             '/api/profile',
             server: ['CONTENT_TYPE' => 'application/json', 'HTTP_ACCEPT' => 'application/json'],
             content: json_encode(['headline' => 'Sem token'], JSON_THROW_ON_ERROR)
@@ -37,7 +37,7 @@ final class ProfileValidationTest extends WebTestCase
         $token = $this->login($client, 'profile-invalid-url@example.com');
 
         $client->request(
-            'PUT',
+            'POST',
             '/api/profile',
             server: [
                 'CONTENT_TYPE' => 'application/json',

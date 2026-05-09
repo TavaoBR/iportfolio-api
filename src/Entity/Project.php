@@ -58,19 +58,20 @@ final class Project
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function getId(): ?int { return $this->id; }
-    public function getName(): string { return $this->name; }
-    public function getDescription(): ?string { return $this->description; }
-    public function getProjectUrl(): ?string { return $this->projectUrl; }
-    public function getRepositoryUrl(): ?string { return $this->repositoryUrl; }
-    public function getStartDate(): ?\DateTimeImmutable { return $this->startDate; }
-    public function getEndDate(): ?\DateTimeImmutable { return $this->endDate; }
-    public function isCurrent(): bool { return $this->isCurrent; }
-    public function getSortOrder(): int { return $this->sortOrder; }
-    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
-    public function getUpdatedAt(): ?\DateTimeImmutable { return $this->updatedAt; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getUser(): User { return $this->user; }
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
 
     public function setName(string $name): static
     {
@@ -78,6 +79,11 @@ final class Project
         $this->touch();
 
         return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
     }
 
     public function setDescription(?string $description): static
@@ -88,12 +94,22 @@ final class Project
         return $this;
     }
 
+    public function getProjectUrl(): ?string
+    {
+        return $this->projectUrl;
+    }
+
     public function setProjectUrl(?string $projectUrl): static
     {
         $this->projectUrl = $this->normalize($projectUrl);
         $this->touch();
 
         return $this;
+    }
+
+    public function getRepositoryUrl(): ?string
+    {
+        return $this->repositoryUrl;
     }
 
     public function setRepositoryUrl(?string $repositoryUrl): static
@@ -104,6 +120,11 @@ final class Project
         return $this;
     }
 
+    public function getStartDate(): ?\DateTimeImmutable
+    {
+        return $this->startDate;
+    }
+
     public function setStartDate(?\DateTimeImmutable $startDate): static
     {
         $this->startDate = $startDate;
@@ -112,12 +133,22 @@ final class Project
         return $this;
     }
 
+    public function getEndDate(): ?\DateTimeImmutable
+    {
+        return $this->endDate;
+    }
+
     public function setEndDate(?\DateTimeImmutable $endDate): static
     {
         $this->endDate = $this->isCurrent ? null : $endDate;
         $this->touch();
 
         return $this;
+    }
+
+    public function isCurrent(): bool
+    {
+        return $this->isCurrent;
     }
 
     public function setIsCurrent(bool $isCurrent): static
@@ -133,6 +164,11 @@ final class Project
         return $this;
     }
 
+    public function getSortOrder(): int
+    {
+        return $this->sortOrder;
+    }
+
     public function setSortOrder(int $sortOrder): static
     {
         $this->sortOrder = $sortOrder;
@@ -141,8 +177,26 @@ final class Project
         return $this;
     }
 
-    public function update(string $name, ?string $description, ?string $projectUrl, ?string $repositoryUrl, ?\DateTimeImmutable $startDate, ?\DateTimeImmutable $endDate, bool $isCurrent, int $sortOrder): void
+    public function getCreatedAt(): \DateTimeImmutable
     {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function update(
+        string $name,
+        ?string $description,
+        ?string $projectUrl,
+        ?string $repositoryUrl,
+        ?\DateTimeImmutable $startDate,
+        ?\DateTimeImmutable $endDate,
+        bool $isCurrent,
+        int $sortOrder,
+    ): void {
         $this->name = trim($name);
         $this->description = $this->normalize($description);
         $this->projectUrl = $this->normalize($projectUrl);
@@ -151,15 +205,20 @@ final class Project
         $this->endDate = $isCurrent ? null : $endDate;
         $this->isCurrent = $isCurrent;
         $this->sortOrder = $sortOrder;
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->touch();
     }
 
     private function normalize(?string $value): ?string
     {
-        if ($value === null) { return null; }
+        if ($value === null) {
+            return null;
+        }
+
         $value = trim($value);
+
         return $value !== '' ? $value : null;
     }
+
     private function touch(): void
     {
         $this->updatedAt = new \DateTimeImmutable();

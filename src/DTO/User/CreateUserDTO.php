@@ -34,6 +34,10 @@ final readonly class CreateUserDTO
         )]
         public string $password,
 
+        #[Assert\Length(
+            max: 3_500_000,
+            maxMessage: 'O avatar excede o tamanho maximo permitido'
+        )]
         public ?string $avatar = null,
     ) {
     }
