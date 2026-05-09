@@ -28,6 +28,13 @@ final class ResumeRepository extends ServiceEntityRepository
         return $resume;
     }
 
+    public function remove(Resume $resume): void
+    {
+        $em = $this->getEntityManager();
+        $em->remove($resume);
+        $em->flush();
+    }
+
     public function unsetMainForUser(User $user): void
     {
         $resumes = $this->createQueryBuilder('r')

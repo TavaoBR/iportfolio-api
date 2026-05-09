@@ -87,6 +87,38 @@ final class SkillService
     }
 
     /**
+     * @return array{status: int, message: string, errors?: mixed}
+     */
+    public function delete(User $user, int $id): array
+    {
+        try {
+            $skill = $this->skills->findOneOwnedByUser($user, $id);
+
+            if (!$skill instanceof Skill) {
+                throw new SkillNotFoundException();
+            }
+
+            $this->skills->remove($skill);
+
+            return [
+                'status' => Response::HTTP_OK,
+                'message' => 'Competencia removida com sucesso',
+            ];
+        } catch (SkillNotFoundException $e) {
+            return [
+                'status' => Response::HTTP_NOT_FOUND,
+                'message' => $e->getMessage(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'message' => 'Ocorreu algum erro inesperado',
+                'errors' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * @return array{status: int, message: string, data?: list<array<string, mixed>>, errors?: mixed}
      */
     public function list(User $user): array

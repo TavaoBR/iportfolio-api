@@ -100,6 +100,38 @@ final class ExperienceService
     }
 
     /**
+     * @return array{status: int, message: string, errors?: mixed}
+     */
+    public function delete(User $user, int $id): array
+    {
+        try {
+            $row = $this->experiences->findOneOwnedByUser($user, $id);
+
+            if (!$row instanceof Experience) {
+                throw new ExperienceNotFoundException();
+            }
+
+            $this->experiences->remove($row);
+
+            return [
+                'status' => Response::HTTP_OK,
+                'message' => 'Experiencia removida com sucesso',
+            ];
+        } catch (ExperienceNotFoundException $e) {
+            return [
+                'status' => Response::HTTP_NOT_FOUND,
+                'message' => $e->getMessage(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'message' => 'Ocorreu algum erro inesperado',
+                'errors' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * @return array{status: int, message: string, data?: list<array<string, mixed>>, errors?: mixed}
      */
     public function list(User $user): array

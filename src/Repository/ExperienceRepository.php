@@ -28,6 +28,13 @@ final class ExperienceRepository extends ServiceEntityRepository
         return $experience;
     }
 
+    public function remove(Experience $experience): void
+    {
+        $em = $this->getEntityManager();
+        $em->remove($experience);
+        $em->flush();
+    }
+
     /**
      * @return list<Experience>
      */

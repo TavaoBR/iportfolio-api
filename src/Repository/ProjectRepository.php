@@ -28,6 +28,13 @@ final class ProjectRepository extends ServiceEntityRepository
         return $project;
     }
 
+    public function remove(Project $project): void
+    {
+        $em = $this->getEntityManager();
+        $em->remove($project);
+        $em->flush();
+    }
+
     /**
      * @return list<Project>
      */

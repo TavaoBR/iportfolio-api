@@ -19,6 +19,7 @@ final class ResumeMapper
             'title' => $resume->getTitle(),
             'target_role' => $resume->getTargetRole(),
             'language' => $resume->getLanguage(),
+            'template_key' => $resume->getTemplateKey(),
             'ats_score' => $resume->getAtsScore(),
             'is_main' => $resume->isMain(),
             'is_public' => $resume->isPublic(),

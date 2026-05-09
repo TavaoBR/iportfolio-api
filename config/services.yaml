@@ -25,5 +25,22 @@ services:
         tags:
             - { name: controller.argument_value_resolver, priority: 110 }
 
+    App\Service\TemplateUnlockService:
+        arguments:
+            $allowPremiumUnlockWithoutPayment: '%env(bool:TEMPLATE_UNLOCK_ALLOW_FREE)%'
+
+    App\Service\Payment\MercadoPago\MercadoPagoApiClient:
+        arguments:
+            $accessToken: '%env(MERCADOPAGO_ACCESS_TOKEN)%'
+
+    App\Service\Payment\MercadoPago\MercadoPagoWebhookProcessor:
+        arguments:
+            $webhookSecret: '%env(MERCADOPAGO_WEBHOOK_SECRET)%'
+
+    App\Service\Payment\MercadoPago\MercadoPagoTemplateCheckoutService:
+        arguments:
+            $defaultUri: '%env(DEFAULT_URI)%'
+            $premiumFallbackAmount: '%env(MERCADOPAGO_PREMIUM_FALLBACK_AMOUNT)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

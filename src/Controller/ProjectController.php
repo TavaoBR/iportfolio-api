@@ -41,6 +41,14 @@ final class ProjectController extends AbstractController
         );
     }
 
+    #[Route('/{id<\d+>}', name: 'api_projects_delete', methods: ['DELETE'])]
+    public function delete(User $user, int $id): JsonResponse
+    {
+        return $this->api->fromServiceResult(
+            $this->projects->delete($user, $id)
+        );
+    }
+
     #[Route('', name: 'api_projects_list', methods: ['GET'])]
     public function list(User $user): JsonResponse
     {

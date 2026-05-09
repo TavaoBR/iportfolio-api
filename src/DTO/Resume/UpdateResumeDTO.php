@@ -26,6 +26,10 @@ final readonly class UpdateResumeDTO
 
         #[SerializedName('is_public')]
         public ?bool $isPublic = null,
+
+        #[SerializedName('template_key')]
+        #[Assert\Length(max: 120)]
+        public ?string $templateKey = null,
     ) {
     }
 }

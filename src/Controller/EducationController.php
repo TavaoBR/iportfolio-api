@@ -41,6 +41,14 @@ final class EducationController extends AbstractController
         );
     }
 
+    #[Route('/{id<\d+>}', name: 'api_educations_delete', methods: ['DELETE'])]
+    public function delete(User $user, int $id): JsonResponse
+    {
+        return $this->api->fromServiceResult(
+            $this->educations->delete($user, $id)
+        );
+    }
+
     #[Route('', name: 'api_educations_list', methods: ['GET'])]
     public function list(User $user): JsonResponse
     {

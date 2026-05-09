@@ -34,6 +34,9 @@ final class Resume
     #[ORM\Column(length: 10)]
     private string $language = 'pt_BR';
 
+    #[ORM\Column(length: 120, nullable: true)]
+    private ?string $templateKey = null;
+
     #[ORM\Column(nullable: true)]
     private ?int $atsScore = null;
 
@@ -111,6 +114,19 @@ final class Resume
         return $this;
     }
 
+    public function getTemplateKey(): ?string
+    {
+        return $this->templateKey;
+    }
+
+    public function setTemplateKey(?string $templateKey): static
+    {
+        $this->templateKey = $this->normalize($templateKey);
+        $this->touch();
+
+        return $this;
+    }
+
     public function getAtsScore(): ?int
     {
         return $this->atsScore;
@@ -166,12 +182,14 @@ final class Resume
         string $language,
         bool $isMain,
         bool $isPublic = false,
+        ?string $templateKey = null,
     ): void {
         $this->title = trim($title);
         $this->targetRole = $this->normalize($targetRole);
         $this->language = $language;
         $this->isMain = $isMain;
         $this->isPublic = $isPublic;
+        $this->templateKey = $this->normalize($templateKey);
         $this->touch();
     }
 

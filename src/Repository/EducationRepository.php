@@ -28,6 +28,13 @@ final class EducationRepository extends ServiceEntityRepository
         return $education;
     }
 
+    public function remove(Education $education): void
+    {
+        $em = $this->getEntityManager();
+        $em->remove($education);
+        $em->flush();
+    }
+
     /**
      * @return list<Education>
      */

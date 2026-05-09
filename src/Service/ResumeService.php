@@ -19,6 +19,7 @@ final class ResumeService
         private readonly ResumeRepository $resumes,
         private readonly ResumeMapper $mapper,
         private readonly PublicIdGenerator $publicIds,
+        private readonly TemplateAssignmentValidator $templateUse,
     ) {
     }
 
@@ -32,12 +33,19 @@ final class ResumeService
                 $this->resumes->unsetMainForUser($user);
             }
 
+            $templateErr = $this->templateUse->validateResumeUse($user, $dto->templateKey);
+            if ($templateErr !== null) {
+                return $templateErr;
+            }
+
             $resume = new Resume($user, $this->publicIds->uuidV4(), $dto->title);
             $resume->updateDraft(
                 title: $dto->title,
                 targetRole: $dto->targetRole,
                 language: $dto->language,
                 isMain: $dto->isMain,
+                isPublic: false,
+                templateKey: $dto->templateKey,
             );
 
             $this->resumes->save($resume);
@@ -108,8 +116,14 @@ final class ResumeService
             $language = $dto->language !== null ? $dto->language : $resume->getLanguage();
             $isMain = $dto->isMain !== null ? $dto->isMain : $resume->isMain();
             $isPublic = $dto->isPublic !== null ? $dto->isPublic : $resume->isPublic();
+            $templateKey = $dto->templateKey !== null ? $dto->templateKey : $resume->getTemplateKey();
 
-            $resume->updateDraft($title, $targetRole, $language, $isMain, $isPublic);
+            $templateErr = $this->templateUse->validateResumeUse($user, $templateKey);
+            if ($templateErr !== null) {
+                return $templateErr;
+            }
+
+            $resume->updateDraft($title, $targetRole, $language, $isMain, $isPublic, $templateKey);
 
             $this->resumes->save($resume);
 
@@ -142,6 +156,38 @@ final class ResumeService
                 'status' => Response::HTTP_OK,
                 'message' => 'Curriculos encontrados com sucesso',
                 'data' => $this->mapper->toArrayList($this->resumes->findByUser($user)),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'message' => 'Ocorreu algum erro inesperado',
+                'errors' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * @return array{status: int, message: string, errors?: mixed}
+     */
+    public function delete(User $user, string $publicId): array
+    {
+        try {
+            $resume = $this->resumes->findByPublicIdForUser($publicId, $user);
+
+            if (!$resume instanceof Resume) {
+                throw new ResumeNotFoundException();
+            }
+
+            $this->resumes->remove($resume);
+
+            return [
+                'status' => Response::HTTP_OK,
+                'message' => 'Curriculo removido com sucesso',
+            ];
+        } catch (ResumeNotFoundException $e) {
+            return [
+                'status' => Response::HTTP_NOT_FOUND,
+                'message' => $e->getMessage(),
             ];
         } catch (\Exception $e) {
             return [

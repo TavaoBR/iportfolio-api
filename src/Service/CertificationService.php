@@ -96,6 +96,38 @@ final class CertificationService
     }
 
     /**
+     * @return array{status: int, message: string, errors?: mixed}
+     */
+    public function delete(User $user, int $id): array
+    {
+        try {
+            $row = $this->certifications->findOneOwnedByUser($user, $id);
+
+            if (!$row instanceof Certification) {
+                throw new CertificationNotFoundException();
+            }
+
+            $this->certifications->remove($row);
+
+            return [
+                'status' => Response::HTTP_OK,
+                'message' => 'Certificacao removida com sucesso',
+            ];
+        } catch (CertificationNotFoundException $e) {
+            return [
+                'status' => Response::HTTP_NOT_FOUND,
+                'message' => $e->getMessage(),
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'message' => 'Ocorreu algum erro inesperado',
+                'errors' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
      * @return array{status: int, message: string, data?: list<array<string, mixed>>, errors?: mixed}
      */
     public function list(User $user): array

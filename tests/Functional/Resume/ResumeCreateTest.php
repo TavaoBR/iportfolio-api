@@ -43,7 +43,7 @@ final class ResumeCreateTest extends WebTestCase
         self::assertTrue($response['data']['is_main']);
         self::assertNull($response['data']['ats_score']);
         self::assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $response['data']['public_id']);
-        self::assertArrayNotHasKey('template_key', $response['data']);
+        self::assertNull($response['data']['template_key'] ?? null);
         self::assertArrayNotHasKey('success', $response);
     }
 

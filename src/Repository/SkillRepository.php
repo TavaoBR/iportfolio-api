@@ -28,6 +28,13 @@ final class SkillRepository extends ServiceEntityRepository
         return $skill;
     }
 
+    public function remove(Skill $skill): void
+    {
+        $em = $this->getEntityManager();
+        $em->remove($skill);
+        $em->flush();
+    }
+
     /**
      * @return list<Skill>
      */

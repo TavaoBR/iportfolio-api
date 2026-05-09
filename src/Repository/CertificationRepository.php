@@ -28,6 +28,13 @@ final class CertificationRepository extends ServiceEntityRepository
         return $certification;
     }
 
+    public function remove(Certification $certification): void
+    {
+        $em = $this->getEntityManager();
+        $em->remove($certification);
+        $em->flush();
+    }
+
     /**
      * @return list<Certification>
      */

@@ -23,6 +23,10 @@ final class CreateResumeDTO
 
         #[SerializedName('is_main')]
         public readonly bool $isMain = false,
+
+        #[SerializedName('template_key')]
+        #[Assert\Length(max: 120)]
+        public readonly ?string $templateKey = null,
     ) {
     }
 }

@@ -41,6 +41,14 @@ final class CertificationController extends AbstractController
         );
     }
 
+    #[Route('/{id<\d+>}', name: 'api_certifications_delete', methods: ['DELETE'])]
+    public function delete(User $user, int $id): JsonResponse
+    {
+        return $this->api->fromServiceResult(
+            $this->certifications->delete($user, $id)
+        );
+    }
+
     #[Route('', name: 'api_certifications_list', methods: ['GET'])]
     public function list(User $user): JsonResponse
     {
