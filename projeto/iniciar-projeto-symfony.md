@@ -264,11 +264,13 @@ php bin/console make:controller AuthController
 Endpoints iniciais:
 
 ```md
-POST /api/auth/register
+POST /api/users
 POST /api/auth/login
-GET  /api/auth/me
+GET  /api/me
 POST /api/auth/logout
 ```
+
+(Cadastro fica em `POST /api/users`.)
 
 Servicos sugeridos:
 

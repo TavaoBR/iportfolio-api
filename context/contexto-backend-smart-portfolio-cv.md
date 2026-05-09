@@ -998,11 +998,13 @@ Responsabilidades:
 ### Auth
 
 ```md
-POST /api/auth/register
+POST /api/users
 POST /api/auth/login
-GET  /api/auth/me
+GET  /api/me
 POST /api/auth/logout
 ```
+
+(Cadastro de conta: sempre `POST /api/users`; nao existe `POST /api/auth/register`.)
 
 ### Profile
 

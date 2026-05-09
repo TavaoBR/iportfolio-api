@@ -134,7 +134,6 @@ O controller autenticado nao deve receber `{id}` para alterar dados do proprio u
 Depois do modulo Auth:
 
 ```md
-POST /api/auth/register
 GET /api/me
 PATCH /api/me
 PATCH /api/me/avatar
@@ -143,13 +142,9 @@ PATCH /api/me/deactivate
 
 ## Decisao
 
-O endpoint `POST /api/users` e endpoints com `/{id}` podem existir no inicio para desenvolvimento e testes antes do Auth.
+O cadastro publico de conta usa **somente** `POST /api/users` (sem `POST /api/auth/register`).
 
-Quando Auth estiver pronto, cadastro publico deve ficar em:
-
-```md
-POST /api/auth/register
-```
+O endpoint `POST /api/users` e endpoints com `/{id}` podem coexistir para cenarios administrativos ou desenvolvimento, conforme a politica de seguranca definida aqui para evitar IDOR.
 
 ## Regra de seguranca
 
